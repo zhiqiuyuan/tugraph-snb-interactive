@@ -21,11 +21,14 @@ extern "C" bool Process(lgraph_api::GraphDB &db, const std::string &request, std
 
     auto txn = db.CreateReadTxn();
     auto person = txn.GetVertexByUniqueIndex(PERSON, PERSON_ID, FieldData::Int64(person_id));
+    // KEY_NOTE
+    // 参数person感兴趣的tag用哈希表存起来
     tsl::hopscotch_set<int64_t> interested_tags;
     for (auto person_tags = LabeledOutEdgeIterator(person, HASINTEREST); person_tags.IsValid(); person_tags.Next()) {
         interested_tags.emplace(person_tags.GetDst());
     }
     int64_t start_vid = person.GetId();
+    // 和IC9类似，也是用BFS实现kowns*2..2，并用hopscotch_set来实现visited
     tsl::hopscotch_set<int64_t> visited({start_vid});
     std::vector<int64_t> curr_frontier({start_vid});
     auto person_out_friends = LabeledOutEdgeIterator(person, KNOWS);
@@ -54,7 +57,9 @@ extern "C" bool Process(lgraph_api::GraphDB &db, const std::string &request, std
     }
     auto &two_hop_friends = curr_frontier;
     std::sort(two_hop_friends.begin(), two_hop_friends.end());
+    // 和IC8类似，也是用set实现topk
     using result_type = std::set<std::tuple<int32_t, int64_t, int64_t>>;
+    // 和IC8类似，多线程实现对每个friend检查生日是否在范围内以及检查有没有person感兴趣tag的post
     static std::vector<Worker> workers(worker_num);
     auto candidates = ForEachVertex<result_type>(
         db, txn, workers, two_hop_friends,
