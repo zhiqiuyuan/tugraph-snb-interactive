@@ -10,6 +10,7 @@ using namespace lgraph_api;
 
 constexpr int worker_num = 4;
 
+// 第二跳：message<-replyof-comment，仅产生topk
 void ProcessMessage(lgraph_api::VertexIterator& message,
                     std::set<std::tuple<int64_t, int64_t, std::string, int64_t>>& candidates,
                     const size_t limit_results) {
@@ -18,6 +19,9 @@ void ProcessMessage(lgraph_api::VertexIterator& message,
         int64_t creation_date = message_replies[REPLYOF_CREATIONDATE].integer();
         int64_t comment_id = -1;
         auto& comment = message;
+        // KEY_NOTE
+        // candidates是set，保证了其按creation_date降序、comment_id升序
+        // 下面保持candidates大小<=limit_results
         if (candidates.size() >= limit_results) {
             auto& candidate = *candidates.rbegin();
             if (0 - creation_date > std::get<0>(candidate)) continue;
@@ -32,6 +36,8 @@ void ProcessMessage(lgraph_api::VertexIterator& message,
             comment_id = comment[COMMENT_ID].integer();
         }
         std::string comment_content = comment[COMMENT_CONTENT].string();
+        // KEY_NOTE
+        // 物化边comment-hascreator->person，存成comment的属性
         int64_t comment_creator = comment[COMMENT_CREATOR].integer();
         candidates.emplace(0 - creation_date, comment_id, comment_content, comment_creator);
         if (candidates.size() > limit_results) {
@@ -49,6 +55,7 @@ extern "C" bool Process(lgraph_api::GraphDB& db, const std::string& request, std
 
     auto txn = db.CreateReadTxn();
     auto person = txn.GetVertexByUniqueIndex(PERSON, PERSON_ID, lgraph_api::FieldData::Int64(person_id));
+    // 第一跳：person<-hascreator-message
     std::vector<int64_t> messages;
     for (auto person_posts = lgraph_api::LabeledInEdgeIterator(person, POSTHASCREATOR); person_posts.IsValid();
          person_posts.Next()) {
@@ -60,6 +67,7 @@ extern "C" bool Process(lgraph_api::GraphDB& db, const std::string& request, std
     }
     using result_type = std::set<std::tuple<int64_t, int64_t, std::string, int64_t>>;
     static std::vector<Worker> workers(worker_num);
+    // 第二跳：message<-replyof-comment，仅产生topk
     auto candidates = ForEachVertex<result_type>(
         db, txn, workers, messages,
         [&](Transaction& t, VertexIterator& vit, result_type& local) {
@@ -70,7 +78,7 @@ extern "C" bool Process(lgraph_api::GraphDB& db, const std::string& request, std
         });
     // output results
     std::stringstream oss;
-    int res_size = std::min(candidates.size(), limit_results);
+    int res_size = std::min(candidates.size(), limit_results); 
     int res_count = 0;
     WriteInt16(oss, res_size);
     for (auto& tup : candidates) {
