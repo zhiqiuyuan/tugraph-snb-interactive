@@ -1,5 +1,18 @@
 # fast link
-[ForEachVertex implementation](https://github.com/TuGraph-family/tugraph-db/blob/b6157130d4abb2b1ee63e39f3961be2a638bd2d2/include/lgraph/olap_base.h#L1271)
+[`ForEachVertex` implementation](https://github.com/TuGraph-family/tugraph-db/blob/b6157130d4abb2b1ee63e39f3961be2a638bd2d2/include/lgraph/olap_base.h#L1271)
+[`#define VERTEX_BATCH_SIZE 1`](https://github.com/TuGraph-family/tugraph-db/blob/b6157130d4abb2b1ee63e39f3961be2a638bd2d2/include/lgraph/olap_base.h#L50)
+
+# knowledge
+`__sync_fetch_and_add`: __sync_fetch_and_add系列一共有十二个函数，有加/减/与/或/异或/等函数的**原子性操作**函数,__sync_fetch_and_add,顾名思义，先fetch，然后自加，返回的是自加以前的值。 以count = 4为例，调用__sync_fetch_and_add (&count,1),之后，返回值是4，然后，count变成了5.
+
+## omp
+execute a specific code segment one by one.
+```cpp
+#pragma omp critical
+{
+    // code snippet
+}
+```
 
 # TuGraph LDBC SNB Manual
 SNB is one of the graph database-oriented benchmarks developed by the Linked Data Benchmark Council (LDBC). The SNB not only includes the performance test of read and write queries, but also includes related verification of system transactionality, recoverability, correctness, and stability. It is currently the most mature and general-purpose benchmark in the graph data industry. This document introduces the process of building and running SNB by TuGraph on a centos-like system of ARM architecture. It mainly includes five parts: preparation, loading & preprocessing, benchmark, backup & recovery, and ACID tests. When performing the test, the Driver officially provided by LDBC and TuGraph Server (SUT) is placed on different server instances, and users can test themselves in the same environment.
