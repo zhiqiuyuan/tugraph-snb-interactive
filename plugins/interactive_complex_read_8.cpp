@@ -68,6 +68,8 @@ extern "C" bool Process(lgraph_api::GraphDB& db, const std::string& request, std
     using result_type = std::set<std::tuple<int64_t, int64_t, std::string, int64_t>>;
     static std::vector<Worker> workers(worker_num);
     // 第二跳：message<-replyof-comment，仅产生topk
+    // KEY_NOTE
+    // 从多个message去走第二跳：8线程（omp实现），每个线程每次取VERTEX_BATCH_SIZE个message顶点来走第二跳
     auto candidates = ForEachVertex<result_type>(
         db, txn, workers, messages,
         [&](Transaction& t, VertexIterator& vit, result_type& local) {
