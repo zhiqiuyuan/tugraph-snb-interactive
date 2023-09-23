@@ -1,9 +1,13 @@
 # fast link
+## impl
 [`ForEachVertex` implementation](https://github.com/TuGraph-family/tugraph-db/blob/b6157130d4abb2b1ee63e39f3961be2a638bd2d2/include/lgraph/olap_base.h#L1271)
 
 [`#define VERTEX_BATCH_SIZE 1`](https://github.com/TuGraph-family/tugraph-db/blob/b6157130d4abb2b1ee63e39f3961be2a638bd2d2/include/lgraph/olap_base.h#L50)
 
-[`LabeledInEdgeIterator`](https://github.com/zhiqiuyuan/tugraph-snb-interactive/blob/6d222104fac60d3e4a6e36193f095683f447d749/plugins/snb_common.h#L137)
+`LabeledInEdgeIterator`：https://github.com/zhiqiuyuan/tugraph-snb-interactive/blob/6d222104fac60d3e4a6e36193f095683f447d749/plugins/snb_common.h#L137，https://github.com/zhiqiuyuan/tugraph-snb-interactive/blob/6d222104fac60d3e4a6e36193f095683f447d749/plugins/snb_common.h#L100
+
+## cpp
+[IC8](https://github.com/zhiqiuyuan/tugraph-snb-interactive/blob/main/plugins/interactive_complex_read_8.cpp)
 
 # knowledge
 `__sync_fetch_and_add`: __sync_fetch_and_add系列一共有十二个函数，有加/减/与/或/异或/等函数的**原子性操作**函数,__sync_fetch_and_add,顾名思义，先fetch，然后自加，返回的是自加以前的值。 以count = 4为例，调用__sync_fetch_and_add (&count,1),之后，返回值是4，然后，count变成了5.
