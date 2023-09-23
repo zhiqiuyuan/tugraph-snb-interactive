@@ -13,6 +13,7 @@ extern "C" bool Process(lgraph_api::GraphDB& db, const std::string& request, std
     auto fd = lgraph_api::FieldData::Int64(message_id);
     auto iit = txn.GetVertexIndexIterator(COMMENT, COMMENT_ID, fd, fd);
     int64_t person_vid;
+    // 同IC8，物化边comment/post-hascreator->person，存成comment/post的属性
     if (iit.IsValid()) {
         auto comment = txn.GetVertexIterator(iit.GetVid());
         person_vid = comment[COMMENT_CREATOR].integer();
