@@ -1,3 +1,6 @@
+# fast link
+[ForEachVertex implementation](https://github.com/TuGraph-family/tugraph-db/blob/b6157130d4abb2b1ee63e39f3961be2a638bd2d2/include/lgraph/olap_base.h#L1271)
+
 # TuGraph LDBC SNB Manual
 SNB is one of the graph database-oriented benchmarks developed by the Linked Data Benchmark Council (LDBC). The SNB not only includes the performance test of read and write queries, but also includes related verification of system transactionality, recoverability, correctness, and stability. It is currently the most mature and general-purpose benchmark in the graph data industry. This document introduces the process of building and running SNB by TuGraph on a centos-like system of ARM architecture. It mainly includes five parts: preparation, loading & preprocessing, benchmark, backup & recovery, and ACID tests. When performing the test, the Driver officially provided by LDBC and TuGraph Server (SUT) is placed on different server instances, and users can test themselves in the same environment.
 # 1. Preparation
