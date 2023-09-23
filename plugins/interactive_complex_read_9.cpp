@@ -79,8 +79,19 @@ extern "C" bool Process(lgraph_api::GraphDB& db, const std::string& request, std
         start_vid = iit.GetVid();
     }
     auto message = txn.GetVertexIterator();
+    // 类似IC8，也是用set实现topk
     std::set<std::tuple<int64_t, int64_t, int64_t, int64_t> > candidates;
+    // KEY_NOTE
+    // 两层BFS实现person-knows*1..2-friend: visited
     tsl::hopscotch_set<int64_t> visited({start_vid});
+    // KEY_NOTE
+    // visit的实现：hopscotch_set而不是unordered_set
+    // see https://github.com/Tessil/hopscotch-map and https://tessil.github.io/hopscotch-map/classtsl_1_1hopscotch__set.html
+    // The hopscotch-map library is a C++ implementation of a fast hash map and hash set using open-addressing and hopscotch hashing to resolve collisions. 
+    // It is a cache-friendly data structure offering better performances than std::unordered_map in most cases 
+    // and is closely similar to google::dense_hash_map while using less memory and providing more functionalities.
+    // A benchmark of tsl::hopscotch_map against other hash maps may be found here: https://tessil.github.io/2016/08/29/benchmark-hopscotch-map.html
+    // An overview of hopscotch hashing and some implementation details can be found here: https://tessil.github.io/2016/08/29/hopscotch-hashing.html
     std::vector<int64_t> curr_frontier({start_vid});
     auto person = txn.GetVertexIterator();
     for (int hop = 0; hop <= 2; hop++) {
