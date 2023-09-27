@@ -112,6 +112,8 @@ extern "C" bool Process(lgraph_api::GraphDB &db, const std::string &request, std
         WriteString(oss, person[PERSON_LASTNAME].string());
         WriteInt32(oss, 0 - std::get<0>(tup));
         WriteString(oss, person[PERSON_GENDER].string());
+        // KEY_NOTE
+        // 物化边person-isLocatedIn->place
         auto place = txn.GetVertexIterator(person[PERSON_PLACE].integer());
         WriteString(oss, place[PLACE_NAME].string());
         if (++res_count == res_size) break;
